@@ -30,12 +30,12 @@ for d = 1:6%dataset
                                 data = ADULT(s); 
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
                                 options.max_epoch=30;    
-                                w_opt = problem.calc_solution(100);
+                                w_opt = problem.calc_solution(80,');
                             elseif d==2
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 options.max_epoch=30;    
-                                w_opt = problem.calc_solution(80);
+                                w_opt = problem.calc_solution(70);
                             elseif d==3
                                 data = GISETTE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
@@ -45,12 +45,12 @@ for d = 1:6%dataset
                                 data = MNIST38(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
                                 options.max_epoch=25;    
-                                w_opt = problem.calc_solution(200);
+                                w_opt = problem.calc_solution(60);
                             elseif d==5
                                 data = W8A(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 options.max_epoch=25;    
-                                w_opt = problem.calc_solution(150);
+                                w_opt = problem.calc_solution(60);
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
