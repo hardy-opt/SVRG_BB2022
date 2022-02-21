@@ -113,17 +113,17 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
                         stepn = (stp/mv)*step;
                         
                     elseif mval==4  % m = 1 and constant c = 1,  m=8
-                        mv = 1;
+                        mv = num_of_bachces;
                         stp = 1;
                         stepn = (stp/mv)*step;
 
                     elseif mval==5  % m = 1 and constant c = eta_0 (decay), m=9
-                        mv = 1/2; 
+                        mv = num_of_bachces/2; 
                         stp = options.stepsizefun(total_iter, options);
                         stepn = (stp/mv)*step;
                         
-                    elseif mval==6  % m = 1 and constant c = eta_0, m=10
-                        mv = 1;
+                    elseif mval==6  % m = 1 and constant c = eta_0, m=7
+                        mv = num_of_bachces;
                         stp = step;
                         stepn = (stp/mv)*step;
                     end
