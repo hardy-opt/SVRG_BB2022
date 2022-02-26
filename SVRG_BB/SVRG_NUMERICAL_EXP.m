@@ -7,7 +7,7 @@ function  SVRG_NUMERICAL_EXP()
 for d = 1:6%dataset    
         dat = char(datast(d));
     
-    for m=1:7
+    for m=8:10%methods
 
         for reg = [0.0001 0.001 0.01] 
    
@@ -24,41 +24,42 @@ for d = 1:6%dataset
                   lr_rate = [];
     
                         for s=1:2
-
+                            
                             fprintf('\n ======      Loop number: S=%d, Step=%f, reg=%f,  m = %d, data = %d ======== \n',s,step,reg,m,d);
                             if d==1
                                 data = ADULT(s); 
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=30;    
-                                w_opt = problem.calc_solution(100);
+                                options.max_epoch=30; %30    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(100);
                             elseif d==2
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=30;    
-                                w_opt = problem.calc_solution(80);
+                                options.max_epoch=30; %30;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(80);
+                                size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
                                 options.max_epoch=20;    
-                                w_opt = problem.calc_solution(40);
+                                [w_opt,infos_LBFGS] = problem.calc_solution(40);
                             elseif d==4
                                 data = MNIST38(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
                                 options.max_epoch=25;    
-                                w_opt = problem.calc_solution(200);
+                                [w_opt,infos_LBFGS] = problem.calc_solution(200);
                             elseif d==5
                                 data = W8A(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 options.max_epoch=25;    
-                                w_opt = problem.calc_solution(150);
+                                [w_opt,infos_LBFGS] = problem.calc_solution(150);
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
                                 options.max_epoch=20;    
-                                w_opt = problem.calc_solution(40);
+                                [w_opt,infos_LBFGS] = problem.calc_solution(40);
                                 
                             end
-                                
+
 
                             f_opt = problem.cost(w_opt); 
                             fprintf('f_opt: %.24e\n', f_opt);  
@@ -69,21 +70,27 @@ for d = 1:6%dataset
                             options.verbose = 2;
                             options.batch_size = 1;
                             options.tol_optgap = 10^-27;
-
+    
                             if m==1
                                 [w_s1, info_s1] = svrg(problem, options);
+                            
                             elseif m==2
                                 [w_s1, info_s1] = svrgdh(problem, options);
                                 fprintf('this is diagonal \n /n')
+                            
                             elseif m==3
                                 [w_s1, info_s1] = svrg_bb(problem, options);
+                            
                             elseif m==4
                                 [w_s1, info_s1] = svrgbb(problem, options);
+                            
                             elseif m==5
                                 [w_s1, info_s1] = svrgbbb(problem, options,1);  % (eta/1) * bb --> SVRG-2BBS --> BB step size with SVRG-2BB eta=fix
+                            
                             elseif m==6
                                  options.step_alg = 'decay';
                                 [w_s1, info_s1] = svrgbbb(problem, options,2);  % (eta/1) * bb --> BB step size with (eta/m=1)*BB --> eta decay
+                            
                             elseif m==7
                                 options.step_alg = 'fix';
                                 [w_s1, info_s1] = svrgbbb(problem, options,3);  % (eta/m) * bb 
@@ -92,14 +99,20 @@ for d = 1:6%dataset
                             elseif m==8
                                 options.step_alg = 'fix';
                                 [w_s1, info_s1] = svrgbbb(problem, options,4);  % (eta/1) * bb --> SVRG-2BBS --> BB step size with SVRG-2BB eta=fix
+                                
                             elseif m==9
                                 options.step_alg = 'decay';
                                 [w_s1, info_s1] = svrgbbb(problem, options,5);  % (eta/1) * bb --> BB step size with (eta/m=1)*BB --> eta decay
+                            
                             elseif m==10
                                 options.step_alg = 'fix';
                                 [w_s1, info_s1] = svrgbbb(problem, options,6);  % (eta/m) * bb 
                             
                             end
+                            pathh = 'SVRG_BB/Results_2022';
+                            LBFGS = infos_LBFGS;
+                            Name = sprintf('%s/%s/LBFGS_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'LBFGS');% 
                             if isinf(w_s1)
                                 %(info_s1.iter(end) < options.max_epoch) && (info_s1.optgap(end) < options.tol_optgap)
                                 break;
@@ -131,7 +144,7 @@ for d = 1:6%dataset
                             info.grad_count = (info_s1.grad_calc_count)';
 
                             S1=info;
-                            pathh = 'SVRG_BB/Results_2022';
+                            
                             if m==1
                             Name = sprintf('%s/%s/svrg_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
                             save(Name,'S1');%

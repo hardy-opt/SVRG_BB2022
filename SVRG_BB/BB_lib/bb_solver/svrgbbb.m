@@ -196,7 +196,7 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
         accvl = problem.accuracy(p_vl,'Vl');
         acc_val = [acc_val accvl]; 
         
-        lr_rate = [lr_rate step];
+        lr_rate = [lr_rate stepn];
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

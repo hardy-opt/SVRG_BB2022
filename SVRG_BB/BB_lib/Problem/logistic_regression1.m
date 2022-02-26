@@ -238,7 +238,7 @@ classdef logistic_regression1
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-          function w_opt = calc_solution(obj, maxiter, method)
+          function [w_opt,infos] = calc_solution(obj, maxiter, method)
 
             if nargin < 3
                 method = 'lbfgs';
@@ -250,19 +250,19 @@ classdef logistic_regression1
             options.step_alg = 'backtracking';
 
             if strcmp(method, 'sd')
-                [w_opt,~] = sd(obj, options);
+                [w_opt,infos] = sd(obj, options);
             elseif strcmp(method, 'cg')
-                [w_opt,~] = ncg(obj, options);
+                [w_opt,infos] = ncg(obj, options);
             elseif strcmp(method, 'newton')
                 options.sub_mode = 'INEXACT';    
                 options.step_alg = 'non-backtracking'; 
-                [w_opt,~] = newton(obj, options);
+                [w_opt,infos] = newton(obj, options);
             else 
                 options.step_alg = 'backtracking';  
                 options.mem_size = 5;
-                [w_opt,~] = lbfgs(obj, options);              
+                [w_opt,infos] = lbfgs(obj, options);              
             end
-        end
+          end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         
