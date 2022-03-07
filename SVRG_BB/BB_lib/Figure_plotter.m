@@ -2,53 +2,26 @@ function Figure_plotter(darg)
 close all;
 %clear;
 clc;
-
+pwd
 
 if strcmp(darg, 'GISETTE') %l2-LR
-    reg = 1e-1;%1e-4;
     endd = 11;
-    pathh='Thesis_Results/Gisette/Gisette/';
-    pathn='Results_Jan_2022/Results_30_Dec2021/Gisette/';
-
 elseif strcmp(darg, 'COVTYPE') %l2-LR
-    pathh='Covtype/';
-    pathn='Results_30_Dec2021/Covtype/';
-    reg = 1e-1;%1e-4;
     endd = 13;
-    
 elseif strcmp(darg, 'W8A') % l2-LR
-    pathh='Thesis_Results/W8A/W8A_o/';
-    pathn='Results_Jan_2022/Results_30_Dec2021/W8A/';
-    reg = 1e-4;%1e-1 remianing
     endd = 21;%26;
-    
 elseif strcmp(darg, 'IJCNN') %l2-SVM
-    pathh='Thesis_Results/IJCNN1/IJCNN1/';
-    pathn='Results_Jan_2022/Results_30_Dec2021/Ijcnn/';
-    reg = 1e-3;
     endd = 16;
-    
-    
 elseif strcmp(darg, 'ADULT')     % l2-svm
-    pathh='Thesis_Results/Adult/AdultN/';
-    pathn='Results_Jan_2022/Results_30_Dec2021/Adult/';
-    reg = 1e-1;
-    endd = 21;%26;
-
-elseif strcmp(darg, 'EPSILON') %l2-svm
-    pathh='Results_Jan_2022/Results_30_Dec2021/EPSILON/';
-    pathn='Results_Jan_2022/Results_30_Dec2021/EPSILON/';
-
+    endd = 31;%26;
 elseif strcmp(darg, 'MNIST')  %l2-LR
-    pathh='Results_Jan_2022/Results_30_Dec2021/MNIST/';
-    pathn='Results_Jan_2022/Results_30_Dec2021/MNIST/';
-
+    
 end
-
+pathh=strcat('SVRG_BB/Results_2022/',darg,'/');
 fname1={'SVRG','SVRG-BB','SVRG-2BB','SVRG-2D','SVRG-2BBSNew'};
 find_par=1; %0 means accuracy and 1 means cost
 
-%reg = 1e-3;
+reg = 1e-3;
 %endd=16;
 fnt=20; %Font
 lgft=23; %
@@ -74,41 +47,46 @@ Ad = [Ad best(7)];
 best1 = other_best(strcat(pathh,'svrg_bb'), find_par,reg); %SVRG-BB
 Ac = [Ac best1(6)];
 Ad = [Ad best1(7)];
-best2 = other_best(strcat(pathh,'svrgbb'), find_par,reg); %SVRG-2BB
+best2 = other_best(strcat(pathh,'svrg_2bb'), find_par,reg); %SVRG-2BB
 Ac = [Ac best2(6)];
 Ad = [Ad best2(7)];
-% best3 = other_best(strcat(pathh,'svrg_bbb'), find_par,reg); %SVRG-2BBS
+best3 = other_best(strcat(pathh,'svrg_2bbs_eta_decay'), find_par,reg); %SVRG-2BBS
 % Ac = [Ac best3(6)];
 % Ad = [Ad best3(7)];
-best4 = other_best(strcat(pathh,'svrgdh'), find_par,reg); %SVRG-2D
+best4 = other_best(strcat(pathh,'svrg_2d'), find_par,reg); %SVRG-2D
 Ac = [Ac best4(6)];
 Ad = [Ad best4(7)];
 %New
-best5 = other_best(strcat(pathn,'svrg_bbb_m1_eta_decay'), find_par,reg); %SVRG-2BBNewS
+best5 = other_best(strcat(pathh,'svrg_2bbs_eta_constant'), find_par,reg); %SVRG-2BBNewS
+Ac = [Ac best5(13)];
+Ad = [Ad best5(7)];
+best6 = other_best(strcat(pathh,'svrg_2bbs_eta_one'), find_par,reg); %SVRG-2BBNewS
 Ac = [Ac best5(13)];
 Ad = [Ad best5(7)];
 
-Ac
-f_opt = 1*min(Ac);
+f_opt = 0*min(Ac);
 f_opt1 = f_opt;
-epsilon = 1e-4;
+epsilon = 0;
 indices = find(Ac==f_opt);
 fprintf('Method = %d',indices);
 
 Name = strcat(pathh,'svrg',sprintf('_%.1e_R_%.1e.mat',best(11),best(12)));
-d=load(Name);
 Name1 = strcat(pathh,'svrg_bb',sprintf('_%.1e_R_%.1e.mat',best1(11),best1(12)));
-d1=load(Name1);
 fprintf('\n \n Now our BB\n \n');
-Name2 = strcat(pathh,'svrgbb',sprintf('_%.1e_R_%.1e.mat',best2(11),best2(12)));
-d2=load(Name2);
-% Name3 = strcat(pathh,'svrg_bbb',sprintf('_%.1e_R_%.1e.mat',best3(11),best3(12)));
-% d3=load(Name3);
-Name4 = strcat(pathh,'svrgdh',sprintf('_%.1e_R_%.1e.mat',best4(11),best4(12)));
-d4=load(Name4);
-%New
-Name5 = strcat(pathn,'svrg_bbb_m1_eta_decay',sprintf('_%.1e_R_%.1e.mat',best5(11),best5(12)));
-d5=load(Name5);
+Name2 = strcat(pathh,'svrg_2bb',sprintf('_%.1e_R_%.1e.mat',best2(11),best2(12)));
+Name3 = strcat(pathh,'svrg_2bbs_eta_decay',sprintf('_%.1e_R_%.1e.mat',best3(11),best3(12)));
+Name4 = strcat(pathh,'svrg_2d',sprintf('_%.1e_R_%.1e.mat',best4(11),best4(12)));
+Name5 = strcat(pathh,'svrg_2bbs_eta_constant',sprintf('_%.1e_R_%.1e.mat',best5(11),best5(12)));
+Name6 = strcat(pathh,'svrg_2bbs_eta_one',sprintf('_%.1e_R_%.1e.mat',best5(11),best5(12)));
+Name
+d=load(Name);   % 1 SVRG
+d1=load(Name1); % 2 SVRG-BB
+d2=load(Name2); % 3 SVRG-2BB
+d3=load(Name3); % 4 SVRG-2BBS-eta-decay
+d4=load(Name4); % 5 SVRG-2D
+d5=load(Name5); % 6 SVRG-2BBS-eta-constant
+d6=load(Name6); % 7 SVRG-2BB-eta-one
+
 e=1;
  c = 1e-0;
 c1 = (mean(d.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
@@ -116,6 +94,16 @@ c2 = (mean(d1.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
 c3 = (mean(d2.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
 c4 = (mean(d4.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
 c5 = (mean(d5.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+c6 = (mean(d6.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+
+
+c1 = (mean(d.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+c2 = (mean(d1.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+c3 = (mean(d2.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+c4 = (mean(d4.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+c5 = (mean(d5.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+c6 = (mean(d6.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
+
 % s1 = isbar*std(d.S1.ocost(1:end,:),[],2)/(1+f_opt1);
 % s2 = isbar*std(d1.S1.ocost(1:end,:),[],2)/(1+f_opt1);
 % s3 = isbar*std(d2.S1.ocost(1:end,:),[],2)/(1+f_opt1);
@@ -135,9 +123,10 @@ c5 = (mean(d5.S1.ocost(1:end,:),2) - f_opt + epsilon)/(1+f_opt1)*c;
 plot(d.S1.epoch(1:endd,:),(c1),'r--*','MarkerSize',msize,'LineWidth',lsize);hold on;
 plot(d1.S1.epoch(1:endd,:),(c2),'b--o','MarkerSize',msize,'LineWidth',lsize);hold on;
 plot(d2.S1.epoch(1:endd,:),(c3),'g-s','MarkerSize',msize,'LineWidth',lsize);hold on;
-%plot(d3.S1.epoch(2:endd,:),(d3.S1.variance(2:endd,:)),'k:>','MarkerSize',msize,'LineWidth',lsize);hold on;
+plot(d3.S1.epoch(2:endd,:),(d3.S1.variance(2:endd,:)),'k:>','MarkerSize',msize,'LineWidth',lsize);hold on;
 plot(d4.S1.epoch(1:endd,:),(c4),'m--o','MarkerSize',msize,'LineWidth',lsize);hold on;
 plot(d5.S1.epoch(1:endd,:),(c5(1:endd)),'k:>','MarkerSize',msize,'LineWidth',lsize);hold on;
+plot(d6.S1.epoch(1:endd,:),(c6(1:endd)),'k--o','MarkerSize',msize,'LineWidth',lsize);hold on;
 xlabel('Epoch','Fontsize',lgft)
 ylabel('Original cost','Fontsize',lgft)
 ylim(cost);
@@ -148,45 +137,6 @@ G.YScale = 'log';
 lgh=legend(fname1,'location','northeast','NumColumns',5);
 % %saveas (gcf, 'Variance_Epoch' , 'epsc' )
 
-%  figure;hold on;
-% % title("Train Acc Vs. Epoch");
-%  errorbar(d.S1.epoch(e:endd,:),mean(d.S1.train_ac(e:endd,:),2),isbar*std(d.S1.train_ac(e:endd,:),[],2),'r-*','MarkerSize',msize,'LineWidth',lsize);hold on;
-%  errorbar(d.S1.epoch(2:endd,:),mean(d1.S1.train_ac(2:endd,:),2),isbar*std(d1.S1.train_ac(2:endd,:),[],2),'b--*','MarkerSize',msize,'LineWidth',lsize);hold on;
-%  errorbar(d.S1.epoch(e:endd,:),mean(d2.S1.train_ac(e:endd,:),2),isbar*std(d2.S1.train_ac(e:endd,:),[],2),'g-s','MarkerSize',msize,'LineWidth',lsize);hold on;
-%  errorbar(d.S1.epoch(2:endd,:),mean(d3.S1.train_ac(2:endd,:),2),isbar*std(d3.S1.train_ac(2:endd,:),[],2),'k--*','MarkerSize',msize,'LineWidth',lsize);hold on;
-%  errorbar(d.S1.epoch(e:endd,:),mean(d4.S1.train_ac(e:endd,:),2),isbar*std(d4.S1.train_ac(e:endd,:),[],2),'m--o','MarkerSize',msize,'LineWidth',lsize);hold on;
-%  errorbar(d.S1.epoch(e:endd,:),mean(d5.S1.train_ac(e:endd,:),2),isbar*std(d5.S1.train_ac(e:endd,:),[],2),'y--o','MarkerSize',msize,'LineWidth',lsize);hold on;
-% 
-%  xlabel('Epoch','FontSize',lgft)
-%  ylabel('Train acc','FontSize',lgft)
-%  ylim(acc);
-%  xlim(epoch);
-%  %legend(fname,'location','southeast');
-% % G = gca;
-% % G.YScale = 'log';
-%  set(gca,'Fontsize',fnt);
-% % saveas (gcf, 'Train_Acc_Epoch' , 'epsc' )
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  figure;hold on;
-% % title("Val Acc Vs. Epoch");
-%  errorbar(d.S1.epoch(e:endd,:),mean(d.S1.val_ac(e:endd,:),2),isbar*std(d.S1.val_ac(e:endd,:),[],2),'r-*','MarkerSize',msize,'LineWidth',lsize); hold on;
-%  errorbar(d.S1.epoch(2:endd,:),mean(d1.S1.val_ac(2:endd,:),2),isbar*std(d1.S1.val_ac(2:endd,:),[],2),'b-*','MarkerSize',msize,'LineWidth',lsize);
-%  errorbar(d.S1.epoch(e:endd,:),mean(d2.S1.val_ac(e:endd,:),2),isbar*std(d2.S1.val_ac(e:endd,:),[],2),'g-s','MarkerSize',msize,'LineWidth',lsize); hold on;
-%  errorbar(d.S1.epoch(2:endd,:),mean(d3.S1.val_ac(2:endd,:),2),isbar*std(d3.S1.val_ac(2:endd,:),[],2),'k-*','MarkerSize',msize,'LineWidth',lsize);
-%  errorbar(d.S1.epoch(e:endd,:),mean(d4.S1.val_ac(e:endd,:),2),isbar*std(d4.S1.val_ac(e:endd,:),[],2),'m--o','MarkerSize',msize,'LineWidth',lsize); hold on;
-%  errorbar(d.S1.epoch(e:endd,:),mean(d5.S1.val_ac(e:endd,:),2),isbar*std(d5.S1.val_ac(e:endd,:),[],2),'k:>','MarkerSize',msize,'LineWidth',lsize); hold on;
-%  xlabel('Epoch','FontSize',lgft)
-%  ylabel('Test acc','FontSize',lgft)
-%   ylim(accc);
-%  xlim(epoch);
-%  %legend(fname,'location','southeast');
-% % %G = gca;
-% % %G.YScale = 'log';
-%  set(gca,'Fontsize',fnt);
-% % saveas (gcf, 'Val_Acc_Epoch' , 'epsc' )
 
 e=1;
 
@@ -270,4 +220,46 @@ G = gca;
 G.YScale = 'log';
 set(gca,'Fontsize',fnt);
 saveas (gcf, 'Variance_Time' , 'epsc' )
+
+
+%  figure;hold on;
+% % title("Train Acc Vs. Epoch");
+%  errorbar(d.S1.epoch(e:endd,:),mean(d.S1.train_ac(e:endd,:),2),isbar*std(d.S1.train_ac(e:endd,:),[],2),'r-*','MarkerSize',msize,'LineWidth',lsize);hold on;
+%  errorbar(d.S1.epoch(2:endd,:),mean(d1.S1.train_ac(2:endd,:),2),isbar*std(d1.S1.train_ac(2:endd,:),[],2),'b--*','MarkerSize',msize,'LineWidth',lsize);hold on;
+%  errorbar(d.S1.epoch(e:endd,:),mean(d2.S1.train_ac(e:endd,:),2),isbar*std(d2.S1.train_ac(e:endd,:),[],2),'g-s','MarkerSize',msize,'LineWidth',lsize);hold on;
+%  errorbar(d.S1.epoch(2:endd,:),mean(d3.S1.train_ac(2:endd,:),2),isbar*std(d3.S1.train_ac(2:endd,:),[],2),'k--*','MarkerSize',msize,'LineWidth',lsize);hold on;
+%  errorbar(d.S1.epoch(e:endd,:),mean(d4.S1.train_ac(e:endd,:),2),isbar*std(d4.S1.train_ac(e:endd,:),[],2),'m--o','MarkerSize',msize,'LineWidth',lsize);hold on;
+%  errorbar(d.S1.epoch(e:endd,:),mean(d5.S1.train_ac(e:endd,:),2),isbar*std(d5.S1.train_ac(e:endd,:),[],2),'y--o','MarkerSize',msize,'LineWidth',lsize);hold on;
+% 
+%  xlabel('Epoch','FontSize',lgft)
+%  ylabel('Train acc','FontSize',lgft)
+%  ylim(acc);
+%  xlim(epoch);
+%  %legend(fname,'location','southeast');
+% % G = gca;
+% % G.YScale = 'log';
+%  set(gca,'Fontsize',fnt);
+% % saveas (gcf, 'Train_Acc_Epoch' , 'epsc' )
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  figure;hold on;
+% % title("Val Acc Vs. Epoch");
+%  errorbar(d.S1.epoch(e:endd,:),mean(d.S1.val_ac(e:endd,:),2),isbar*std(d.S1.val_ac(e:endd,:),[],2),'r-*','MarkerSize',msize,'LineWidth',lsize); hold on;
+%  errorbar(d.S1.epoch(2:endd,:),mean(d1.S1.val_ac(2:endd,:),2),isbar*std(d1.S1.val_ac(2:endd,:),[],2),'b-*','MarkerSize',msize,'LineWidth',lsize);
+%  errorbar(d.S1.epoch(e:endd,:),mean(d2.S1.val_ac(e:endd,:),2),isbar*std(d2.S1.val_ac(e:endd,:),[],2),'g-s','MarkerSize',msize,'LineWidth',lsize); hold on;
+%  errorbar(d.S1.epoch(2:endd,:),mean(d3.S1.val_ac(2:endd,:),2),isbar*std(d3.S1.val_ac(2:endd,:),[],2),'k-*','MarkerSize',msize,'LineWidth',lsize);
+%  errorbar(d.S1.epoch(e:endd,:),mean(d4.S1.val_ac(e:endd,:),2),isbar*std(d4.S1.val_ac(e:endd,:),[],2),'m--o','MarkerSize',msize,'LineWidth',lsize); hold on;
+%  errorbar(d.S1.epoch(e:endd,:),mean(d5.S1.val_ac(e:endd,:),2),isbar*std(d5.S1.val_ac(e:endd,:),[],2),'k:>','MarkerSize',msize,'LineWidth',lsize); hold on;
+%  xlabel('Epoch','FontSize',lgft)
+%  ylabel('Test acc','FontSize',lgft)
+%   ylim(accc);
+%  xlim(epoch);
+%  %legend(fname,'location','southeast');
+% % %G = gca;
+% % %G.YScale = 'log';
+%  set(gca,'Fontsize',fnt);
+% % saveas (gcf, 'Val_Acc_Epoch' , 'epsc' )
+
 end

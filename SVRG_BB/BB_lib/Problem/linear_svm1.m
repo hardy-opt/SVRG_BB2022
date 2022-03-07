@@ -135,14 +135,8 @@ classdef linear_svm1
             x_part_new = x_part_new(:,flag_indices);
             
             
-            d = obj.lambda*ones(obj.d,1) + sum(x_part_new.^2,2);
-%             
-%             h = hess(obj, w, indices);
-%             h = diag(h);
-%             if all(h)==all(d)
-%                 fprintf('\n Hessian is correct')
-%             end
-%             
+            d = obj.lambda*ones(obj.d,1) + sum(x_part_new.^2,2)/length(indices);
+            
         end
         
         function d = full_diag_hess(obj,w)

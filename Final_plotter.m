@@ -1,124 +1,371 @@
-function Final_plotter(darg)
+%function Final_plotter(darg)
 close all;
-%clear;
 clc;
-pwd
+%pwd;
+data = {'Adult','Covtype','Gisette','Mnist','Ijcnn','W8a'};
+darg = char(data(3));
+%fprintf('\nData is %s:\n',darg);
+
 
 pathh=strcat('SVRG_BB/Results_2022/',darg,'/');
-find_par=1; %0 means accuracy and 1 means cost
+find_par=0; %0 means accuracy and 1 means cost
+reg = 1e-2;
 
-reg = 1e-3;
-fnt=20; %Font
+
+if reg == 1e-2
+    re = -2;
+elseif reg == 1e-3
+    re = -3;
+else
+    re = -4;
+end
+epsilon = 1*5e-15;
+fnt=22; %Font
 lgft=23; %
-msize=10; %Marker size
+msize=12; %Marker size
 lsize=2; % Legend size 
 isbar=1;
-cost=[1e-2,0.4];
-%cost = ['auto'];
+cost1 = 'auto';
 %time=[0,2000];
-time = 'auto';
-%epoch=[0,20];
-epoch='auto';
-fname1={'SVRG','SVRG-BB','SVRG-2BB','SVRG-2D','SVRG-2BBS-ed','SVRG-2BBS-ec','SVRG-2BBS-e1'};%
-method = {'svrg','svrg_bb','svrg_2bb','svrg_2d','svrg_2bbs_eta_decay','svrg_2bbs_eta_constant','svrg_2bbs_eta_one'};
+%time = 'auto';
+var = 'auto';
+acc = [0.75,1.05];
+%fname1={'SVRG','SVRG-BB','SVRG-2BB','SVRG-2D','SVRG-2BBS-ed','SVRG-2BBS-e1'};%'SVRG-2BBS-ec'
+fname1={'SVRG    ','SVRG-BB ','SVRG-2BB','SVRG-2D ','SVRG-M1 ','SVRG-M4 '};
+%fname1={'SVRG    ','SVRG-2BB','SVRG-2D '};
+l = length(fname1);
+method = {'svrg','svrg_bb','svrg_2bb','svrg_2d','svrg_2bbs_eta_one','svrg_2bbs_eta_decay_m1','LBFGS'};%'svrg_2bbs_eta_constant'
+%method = {'svrg','svrg_2bb','svrg_2d','LBFGS'};%'svrg_2bbs_eta_constant'
+
 Act_cost=[]; % Actual cost
 Act_dv=[]; %Actual daviation 
-best = zeros(7,14);
+best = zeros(l,14);
+bestL = zeros(1,4);
 d = [];
-for i = 1:7
+fprintf(' %s-Best Parameters for %.1e  \n    |Method    | Step size | \n',darg,reg)
+for i = 1:l
     best(i,:) = other_best(strcat(pathh,char(method(i))), find_par, reg);
-    Act_cost = [Act_cost best(i,6)];
-    Act_dv = [Act_dv best(i,7)];
+     Act_cost = [Act_cost best(i,13)];
+%     Act_dv = [Act_dv best(i,7)];
     d{i} = load(strcat(pathh,char(method(i)),sprintf('_%.1e_R_%.1e.mat',best(i,11),best(i,12))));
     ep = length(d{1}.S1.epoch);
+    fprintf('    |%s  |   %.1e | \n', char(fname1(i)), best(i,11));
 end
 
-f_opt = min(Act_cost);
-f_opt1 = f_opt;
-epsilon = 1e-5;
-ind = find(Act_cost==f_opt);
-fprintf('Method = %s',char(method(ind)));
-g = [];
-marker = ['o','<','*','s','p','v','^'];
-% G1 = figure;%nexttile;
-% G2 = figure;%nexttile;
-% G3 = figure;%nexttile;
+bestL(1,:) = other_best_LBFGS(strcat(pathh,char(method(end))), find_par, reg);
+F = load(strcat(pathh,char(method(end)),sprintf('_%.1e_R_%.1e.mat',bestL(1,3),bestL(1,4))));
 
-figure;
-for j = 1:7
-    
-    %variance and CPU time
-    g{j}.variance = d{j}.S1.variance(1:end);
+
+f_opt = F.LBFGS.cost(end);
+cost=[0.1*f_opt,1];
+fprintf('\n Optimal cost =  %.18e \n',f_opt);
+f_opt1 = f_opt;
+ind = find(Act_cost==f_opt);
+% fprintf('\n Best Method = M%d-%s \n',ind,char(method(ind)));
+g = [];
+marker = ['p','+','s','*','^','o','>','<','_'];
+col = [0 0 0;
+       0 0 1;
+       1 0 0;
+       %0.466 0.674 0.188;
+       0.290 0.694 0.025;
+       0.9290 0.6940 0.5250;
+       0.494 0.184 0.556];
+for j = 1:l
+    % X axis properties
     g{j}.time = d{j}.S1.otime(1:end);
     g{j}.epoch = d{j}.S1.epoch(1:end);
-    g1 = plot(g{j}.time,g{j}.variance,'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold on;
-    if j==7
-    %ylim(cost);
-    title('Variance/Epoch');
-    Gr1 = gca;
-    set(gca,'Fontsize',fnt);
-    Gr1.YScale = 'log';
-    legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
-    hold off
-    end
-end    
-disp('\n First');      
-
-figure;
-for j = 1:7
-    %mean and standart daviation of cost
+    
+    
+    % Variance
+    g{j}.variance = d{j}.S1.variance(1:end);
+    
+    
+    % Train cost
     g{j}.cost_mean = mean(d{j}.S1.ocost(1:end,:),2);
     g{j}.cost_std = isbar*std(d{j}.S1.ocost(1:end,:),[],2);
-    %g2 = errorbar(G2,g{j}.epoch,g{j}.cost_mean,g{j}.cost_std,'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold(G2,'on');
-    g2 = plot(g{j}.time,(g{j}.cost_mean - f_opt + epsilon)/(1+f_opt),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
-    
-    if j==7
-    %ylim(cost);
-    title('Cost/Time');
-    Gr1 = gca;
-    set(gca,'Fontsize',fnt);
-    Gr1.YScale = 'log';
-    legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
-    hold off
-    end
-end  
-disp('\n second');      
-figure;
-for j = 1:7
-    %mean and standart daviation of optimal cost
-    g{j}.opt_mean = abs(mean(d{j}.S1.opt_gap(1:end,:),2));
-    g{j}.opt_std = abs(isbar*std(d{j}.S1.opt_gap(1:end,:),[],2));
-    g3 = errorbar(g{j}.time,g{j}.opt_mean,g{j}.opt_std,'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
-    
-    if j==7
-    %ylim(cost);
-    title('Optcost/Epoch');
-    Gr1 = gca;
-    set(gca,'Fontsize',fnt);
-    Gr1.YScale = 'log';
-    legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
-    hold off
-    end
+    g{j}.cost = abs(g{j}.cost_mean)/f_opt;% - f_opt + epsilon)/(1+f_opt);
     
     
-    %mean and standart daviation of validation cost
-%     g{j}.vcost_mean = mean(d{j}.S1.vcost(1:end,:),2);
-%     g{j}.vcost_std = std(d{j}.S1.vcost(1:end,:),[],2);
-        
-    
-    %mean and standart daviation of Train ACC
-%     g{j}.train_ac_mean = mean(d{j}.S1.train_ac(1:end,:),2);
-%     g{j}.train_ac_std = std(d{j}.S1.train_ac(1:end,:),[],2);
-    
-    %mean and standart daviation of Train ACC
-%     g{j}.val_ac_mean = mean(d{j}.S1.val_ac(1:end,:),2);
-%     g{j}.val_ac_std = std(d{j}.S1.val_ac(1:end,:),[],2);
-    
-    %Lacotte style
-    %g{j}.Lacotte_style = (g{j}.cost_mean - f_opt + epsilon)/(1+f_opt);
-    
+    % Optimality gap = cost - optimal cost
+%     g{j}.opt_mean = abs(mean(d{j}.S1.opt_gap(1:end,:),2)); 
+%     g{j}.opt_std = isbar*std(d{j}.S1.opt_gap(1:end,:),[],2);
+%     g{j}.optgap = abs(g{j}.opt_mean);% - f_opt + epsilon)/(1+f_opt);
+      g{j}.optgap = abs(g{j}.cost_mean - f_opt + epsilon)/(1+f_opt);
 
-end
+    
+    % Validation cost
+    g{j}.vcost_mean = mean(d{j}.S1.vcost(1:end,:),2);
+    g{j}.vcost_std = (isbar*std(d{j}.S1.vcost(1:end,:),[],2));
+    g{j}.vcost = abs(g{j}.vcost_mean);% - f_opt + epsilon);%/(1+f_opt);
+    
+    
+    % Train accuracy
+    g{j}.train_acc = mean(d{j}.S1.train_ac,2);
+    
+    
+    % Validation accuracy 
+    g{j}.val_acc = mean(d{j}.S1.val_ac,2);
+end  
+
+
+
+% f1 = figure; % cost vs time
+% f2 = figure; % cost vs epoch
+% f3 = figure; % vcost vs time
+% f4 = figure; % vcost vs epoch
+f5 = figure; % optimal cost vs time
+f6 = figure; % optimal cost vs epoch
+% f7 = figure; % variance vs time
+ f8 = figure; % variance vs epoch
+% f9 = figure; % train ac vs time
+% f10 = figure; % train ac vs epoch
+% f11 = figure; % val ac vs time
+% f12 = figure; % val ac vs epoch
+
+for j = 1:l
+
+
+%     %g2 = errorbar(g{j}.epoch,g{j}.cost_mean,g{j}.cost_std,'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     figure(f1)
+%     plot(g{j}.time,g{j}.cost,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     
+%     figure(f2)
+%     plot(g{j}.epoch,g{j}.cost,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+    
+%     figure(f3)
+%     plot(g{j}.time,g{j}.vcost,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+    
+%     figure(f4)
+%     plot(g{j}.epoch,g{j}.vcost,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+    
+    figure(f5)
+    plot(g{j}.time,g{j}.optgap,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+    
+    figure(f6)
+    plot(g{j}.epoch,g{j}.optgap,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     figure(f7)
+%     plot(g{j}.time,g{j}.variance,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+    figure(f8)
+    plot(g{j}.epoch,g{j}.variance,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     
+%     figure(f9)
+%     plot(g{j}.time,g{j}.train_acc,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     
+%     figure(f10)
+%     plot(g{j}.epoch,g{j}.train_acc,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     
+%     figure(f11)
+%     plot(g{j}.time,g{j}.val_acc,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     
+%     figure(f12)
+%     plot(g{j}.epoch,g{j}.val_acc,'color',col(j,:),'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+    
+    if j==l
+    
+%     figure(f1);
+%     %title('Train cost');
+%     xlabel('Time (sec)','Fontsize',fnt)
+%     ylabel('Train cost','Fontsize',fnt)
+%     Gr1 = gca;
+%     set(gca,'Fontsize',fnt);
+%     ylim(cost);
+%     %Gr1.YScale = 'log';
+% 
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%        
+%       
+%     figure(f2);
+%     %title('Train cost');
+%     xlabel(' Epoch','Fontsize',fnt)
+%     ylabel('Train cost','Fontsize',fnt)
+%     Gr2 = gca;
+%     set(gca,'Fontsize',fnt);
+%     ylim(cost);
+%     Gr2.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%      
+%     
+%     figure(f3);
+%     %title('Val. cost');
+%     xlabel('Time (sec)','Fontsize',fnt)
+%     ylabel('Val. cost','Fontsize',fnt)
+%     Gr1 = gca;
+%     set(gca,'Fontsize',fnt);
+%     ylim(cost);
+%     Gr1.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%        
+%       
+%     figure(f4);
+%     title(strcat('\',sprintf('lambda = 10^{%d}',re)));
+%     xlabel(' Epoch','Fontsize',fnt)
+%     %ylim(cost);
+%     ylabel('Val. cost','Fontsize',fnt)
+%     Gr1 = gca;
+%     set(gca,'Fontsize',fnt);
+%     ylim(cost1);
+%     Gr1.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%     
+    
+    figure(f5);
+    %title('Train cost');
+    xlabel('Time (sec)','Fontsize',fnt)
+    ylabel('Opt. gap','Fontsize',fnt)
+    Gr1 = gca;
+    set(gca,'Fontsize',fnt);
+    ylim(cost1);
+    Gr1.YScale = 'log';
+    %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+    saveas(gcf, sprintf('%s-%.1e-Opt_Time.eps',darg,reg) , 'epsc' )
+    hold off
+       
+      
+    figure(f6);
+    %title('\lambda  = 10^{-3}');
+    xlabel(' Epoch','Fontsize',fnt)
+    %ylim(cost);
+    ylabel('Opt. gap','Fontsize',fnt)
+    Gr1 = gca;
+    ylim(cost1);
+    set(gca,'Fontsize',fnt);
+    Gr1.YScale = 'log';
+    %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+    saveas(gcf, sprintf('%s-%.1e-Opt_Epoch.eps',darg,reg) , 'epsc' )
+    hold off
+    
+    
+%     figure(f7);
+%     %title('Train cost');
+%     xlabel('Time (sec)','Fontsize',fnt)
+%     ylabel('Variance','Fontsize',fnt)
+%     Gr1 = gca;
+%     ylim(var);
+%     set(gca,'Fontsize',fnt);
+%     Gr1.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%        
+%       
+    figure(f8);
+    %title('Train cost');
+    xlabel(' Epoch','Fontsize',fnt)
+    ylim(var);
+    ylabel('Variance','Fontsize',fnt)
+    Gr1 = gca;
+    set(gca,'Fontsize',fnt);
+    Gr1.YScale = 'log';
+    %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+    saveas(gcf, sprintf('%s-%.1e-Var_Epoch.eps',darg,reg) , 'epsc' )
+    hold off
+    
+%     
+%     
+%     figure(f9);
+%     %title('Train cost');
+%     xlabel('Time (sec)','Fontsize',fnt)
+%     ylabel('Train acc.','Fontsize',fnt)
+%     Gr1 = gca;
+%     ylim(acc);
+%     set(gca,'Fontsize',fnt);
+%     %Gr1.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%        
+%       
+%     figure(f10);
+%     %title('Train cost');
+%     xlabel(' Epoch','Fontsize',fnt)
+%     %ylim(cost);
+%     ylabel('Train acc.','Fontsize',fnt)
+%     Gr1 = gca;
+%     ylim(acc);
+%     set(gca,'Fontsize',fnt);
+%     %Gr1.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%     
+%     
+%     
+%     figure(f11);
+%     %title('Val acc');
+%     xlabel('Time (sec)','Fontsize',fnt)
+%     ylabel('Val. acc.','Fontsize',fnt)
+%     Gr1 = gca;
+%     ylim(acc);
+%     set(gca,'Fontsize',fnt);
+%     %Gr1.YScale = 'log';
+%     %legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%        
+%       
+%     figure(f12);
+%     %title('');
+%     xlabel('Epoch','Fontsize',fnt)
+%     ylim(acc);
+%     ylabel('Val. acc.','Fontsize',fnt)
+%     Gr1 = gca;
+%     set(gca,'Fontsize',fnt);
+%     %Gr1.YScale = 'log';
+%     legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+    end
+    
+    
+end 
+
+% figure;
+% for j = 1:l
+%     %mean and standart daviation of optimal cost
+%     
+%     g3 = errorbar(g{j}.epoch,g{j}.opt_mean,g{j}.opt_std,'Marker',marker(j),'MarkerSize',msize,'LineWidth',lsize); hold('on');
+%     
+%     if j==l
+%     %ylim(cost);
+%     title('Optcost/Epoch');
+%     xlabel('Epoch','Fontsize',fnt)
+%     ylabel('Optimal cost','Fontsize',fnt)
+%     Gr1 = gca;
+%     set(gca,'Fontsize',fnt);
+%     Gr1.YScale = 'log';
+%     legend(fname1,'Location','NorthOutside','Orientation','horizontal','Box','on');
+%     hold off
+%     end
+%     
+%     
+%     %mean and standart daviation of validation cost
+% %     g{j}.vcost_mean = mean(d{j}.S1.vcost(1:end,:),2);
+% %     g{j}.vcost_std = std(d{j}.S1.vcost(1:end,:),[],2);
+%         
+%     
+%     %mean and standart daviation of Train ACC
+% %     g{j}.train_ac_mean = mean(d{j}.S1.train_ac(1:end,:),2);
+% %     g{j}.train_ac_std = std(d{j}.S1.train_ac(1:end,:),[],2);
+%     
+%     %mean and standart daviation of Train ACC
+% %     g{j}.val_ac_mean = mean(d{j}.S1.val_ac(1:end,:),2);
+% %     g{j}.val_ac_std = std(d{j}.S1.val_ac(1:end,:),[],2);
+%     
+%     %Lacotte style
+%     %g{j}.Lacotte_style = (g{j}.cost_mean - f_opt + epsilon)/(1+f_opt);
+%     
+% 
+% end
+
+
 
 % for
 % 
@@ -297,4 +544,4 @@ end
 %  set(gca,'Fontsize',fnt);
 % % saveas (gcf, 'Val_Acc_Epoch' , 'epsc' )
 
-end
+%end

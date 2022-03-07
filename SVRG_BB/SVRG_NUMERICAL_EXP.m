@@ -7,7 +7,7 @@ function  SVRG_NUMERICAL_EXP()
 for d = 1:6%dataset    
         dat = char(datast(d));
     
-    for m=8:10%methods
+    for m=2:2%methods
 
         for reg = [0.0001 0.001 0.01] 
    
@@ -77,6 +77,7 @@ for d = 1:6%dataset
                             elseif m==2
                                 [w_s1, info_s1] = svrgdh(problem, options);
                                 fprintf('this is diagonal \n /n')
+                                break
                             
                             elseif m==3
                                 [w_s1, info_s1] = svrg_bb(problem, options);

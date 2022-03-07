@@ -113,22 +113,19 @@ function [w, infos] = svrgdh(problem, in_options)
             %g = problem.grad(w,ind) - problem.grad(w0,ind) + full_grad + problem.hess_vec() + problem.hess_vec();
             bb = A.*vec -Atk.*vec;
             
-            
             % update w
             v = full_grad + grad - grad_0 + bb;
             w = w - step * v;
-            
-            
-            
+            break
             if any(isnan(v)) || any(isinf(v)) || any(isnan(w)) || any(isinf(w)) || optgap>10^5
                     w=inf;
                  return;   
             end
             
-            % proximal operator
-            if ismethod(problem, 'prox')
-                w = problem.prox(w, step);
-            end  
+%             % proximal operator
+%             if ismethod(problem, 'prox')
+%                 w = problem.prox(w, step);
+%             end  
         
             total_iter = total_iter + 1;
             
