@@ -136,6 +136,11 @@ classdef linear_svm1
             
             
             d = obj.lambda*ones(obj.d,1) + sum(x_part_new.^2,2)/length(indices);
+%             d(1:10)
+%             h = hess(obj,w,indices);
+%             h = diag(h);
+%             disp('hhh')
+%             h(1:10)
             
         end
         

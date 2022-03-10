@@ -4,11 +4,12 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = 1:6%dataset    
-        dat = char(datast(d));
+for d = [2 4 5]%2%dataset    
+    d    
+    dat = char(datast(d));
     
     for m=2:2%methods
-
+    
         for reg = [0.0001 0.001 0.01] 
    
     
@@ -35,7 +36,7 @@ for d = 1:6%dataset
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 options.max_epoch=30; %30;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(80);
+                                [w_opt,infos_LBFGS] = problem.calc_solution(80);%80
                                 size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
@@ -77,7 +78,7 @@ for d = 1:6%dataset
                             elseif m==2
                                 [w_s1, info_s1] = svrgdh(problem, options);
                                 fprintf('this is diagonal \n /n')
-                                break
+                                
                             
                             elseif m==3
                                 [w_s1, info_s1] = svrg_bb(problem, options);

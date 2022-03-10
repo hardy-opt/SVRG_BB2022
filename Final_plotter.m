@@ -1,14 +1,14 @@
 %function Final_plotter(darg)
 close all;
 clc;
-%pwd;
+%pwd;%%%  LR       LR        LR       SVM      SVM    SVM
 data = {'Adult','Covtype','Gisette','Mnist','Ijcnn','W8a'};
 darg = char(data(3));
 %fprintf('\nData is %s:\n',darg);
 
 
 pathh=strcat('SVRG_BB/Results_2022/',darg,'/');
-find_par=0; %0 means accuracy and 1 means cost
+find_par=1; %0 means accuracy and 1 means cost
 reg = 1e-2;
 
 

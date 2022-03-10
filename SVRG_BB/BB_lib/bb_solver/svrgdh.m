@@ -116,7 +116,7 @@ function [w, infos] = svrgdh(problem, in_options)
             % update w
             v = full_grad + grad - grad_0 + bb;
             w = w - step * v;
-            break
+            
             if any(isnan(v)) || any(isinf(v)) || any(isnan(w)) || any(isinf(w)) || optgap>10^5
                     w=inf;
                  return;   

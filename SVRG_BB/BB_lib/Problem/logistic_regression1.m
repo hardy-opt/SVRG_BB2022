@@ -171,10 +171,14 @@ classdef logistic_regression1
             %if any(isnan(sqtthd)) || any(isinf(sqtthd))
             %   fprintf(' sqt is naninf= \n');
             %end
-            
+%             
 %              h = hess(obj,w,indices);
 %              H = diag(h);
-%             
+%              disp('hhh')
+%              H(1:10)
+%              disp('ddd')
+%              dh(1:10)
+%            disp 
 %              if all(dh == H)
 % %                 
 %               fprintf('digaonal elements are the same\n');
