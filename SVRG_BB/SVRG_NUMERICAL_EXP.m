@@ -8,7 +8,7 @@ for d = [2 4 5]%2%dataset
     d    
     dat = char(datast(d));
     
-    for m=2:2%methods
+    for m=1:10%methods
     
         for reg = [0.0001 0.001 0.01] 
    
