@@ -90,6 +90,7 @@ function [w, infos] = svrg(problem, in_options)
         
         for j = 1 : num_of_bachces
             
+            
             % update step-size
             step = options.stepsizefun(total_iter, options);                 
            
@@ -98,8 +99,6 @@ function [w, infos] = svrg(problem, in_options)
             indice_j = perm_idx(start_index:start_index+options.batch_size-1);
             grad = problem.grad(w, indice_j);
             grad_0 = problem.grad(w0, indice_j);
-            
-            
 
             
             % update w
@@ -113,11 +112,13 @@ function [w, infos] = svrg(problem, in_options)
                  return;   
             end
             
-            % proximal operator
-            if ismethod(problem, 'prox')
-                w = problem.prox(w, step);
-            end  
+                
+%             % proximal operator
+%             if ismethod(problem, 'prox')
+%                 w = problem.prox(w, step);
+%             end  
         
+         
             total_iter = total_iter + 1;
             
             % store sub infos

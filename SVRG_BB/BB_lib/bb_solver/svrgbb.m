@@ -1,4 +1,4 @@
-function [w, infos] = svrg2bb(problem, in_options)
+function [w, infos] = svrgbb(problem, in_options)
 % Stochastic Variance gradient descent with Barzilai-Borwein (SVRG-BB) algorithm.
 %
 % Inputs:
@@ -147,11 +147,11 @@ function [w, infos] = svrg2bb(problem, in_options)
                  return;   
             end
             
-            % proximal operator
-            if ismethod(problem, 'prox')
-                w = problem.prox(w, step);
-            end  
-            
+%             % proximal operator
+%             if ismethod(problem, 'prox')
+%                 w = problem.prox(w, step);
+%             end  
+%             
             total_iter = total_iter + 1;
         end
         

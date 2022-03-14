@@ -1,4 +1,4 @@
-function [w, infos] = svrgdh(problem, in_options)
+ function [w, infos] = svrgdh(problem, in_options)
 % Stochastic Variance gradient descent (SVRG) algorithm.
 %
 % Inputs:
@@ -93,7 +93,7 @@ function [w, infos] = svrgdh(problem, in_options)
         
        %end
         for j = 1 : num_of_bachces
-            
+
             % update step-size
             step = options.stepsizefun(total_iter, options);                 
             

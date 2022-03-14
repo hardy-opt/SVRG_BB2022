@@ -118,10 +118,10 @@ function [w, infos] = svrg_bb(problem, in_options)
                  return;   
             end
             
-            % proximal operator
-            if ismethod(problem, 'prox')
-                w = problem.prox(w, step);
-            end  
+%             % proximal operator
+%             if ismethod(problem, 'prox')
+%                 w = problem.prox(w, step);
+%             end  
             
             total_iter = total_iter + 1;
         end
