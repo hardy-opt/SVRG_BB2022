@@ -1,22 +1,5 @@
  function [w, infos] = svrgdh(problem, in_options)
 % Stochastic Variance gradient descent (SVRG) algorithm.
-%
-% Inputs:
-%       problem     function (cost/grad/hess)
-%       in_options  options
-% Output:
-%       w           solution of w
-%       infos       information
-%
-% References:
-%       Rie Johnson and Tong Zhang, 
-%       "Accelerating Stochastic Gradient Descent using Predictive Variance Reduction,"
-%       NIPS, 2013.
-%    
-% This file is part of SGDLibrary.
-%
-% Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -58,8 +41,10 @@
     % display infos
     if options.verbose > 0
         fprintf('SVRGDH: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
-    end      
+    end
     
+    step = options.step_init;
+
     % set start time
     start_time = tic();
 
@@ -95,7 +80,7 @@
         for j = 1 : num_of_bachces
 
             % update step-size
-            step = options.stepsizefun(total_iter, options);                 
+            %step = options.stepsizefun(total_iter, options);                 
             
            
             
@@ -137,11 +122,11 @@
             end            
         end
         
+        % measure elapsed time
+        elapsed_time = toc(start_time);
         
         vr = norm(step*v-step*problem.grad(w,1:n))^2;
         
-        % measure elapsed time
-        elapsed_time = toc(start_time);
         
         % count gradient evaluations
         grad_calc_count = grad_calc_count + j * options.batch_size;        

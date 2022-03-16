@@ -23,7 +23,6 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
     %%%%%%%%%%%%%%%%
 
 
-
     % initialize
     total_iter = 0;
     epoch = 0;
@@ -34,10 +33,13 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
      
     if ~isfield(options, 'max_inner_iter')
         options.max_inner_iter = num_of_bachces;
-    end       
+    end
+    
     step = options.step_init;
     stepn = step;
-    
+    sto = step;    
+    regul = options.regu;
+
     
     %mval, eta val 
  
@@ -47,14 +49,15 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
     clear infos;    
     [infos, f_val, optgap] = store_infos(problem, w, options, [], epoch, grad_calc_count, 0);  
     
-    % set start time
-    start_time = tic();
     
     % display infos
     if options.verbose > 0
         fprintf('SVRG-2BBS: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
-    end      
-
+    end
+    
+    % set start time
+    start_time = tic();
+    
     % main loop
     %while (optgap > options.tol_optgap) && (epoch < options.max_epoch)
     while  (epoch < options.max_epoch)
@@ -70,7 +73,7 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
             full_grad_old = full_grad;
 
             % compute full gradient
-            full_grad = problem.grad(w,1:n);
+            full_grad = problem.full_grad(w);
   
             % automatic step size selection based on Barzilai-Borwein (BB)
             w_diff = w - w0;
@@ -83,7 +86,7 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
            % fprintf('step:%f\n', step);
         else
             % compute full gradient
-            full_grad = problem.grad(w,1:n);
+            full_grad = problem.full_grad(w);
         end
         
         % store w
@@ -104,7 +107,8 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
 
                     elseif mval==2  % m = 2n and constant c = eta_0 (decay), m=6
                         mv = num_of_bachces/2; 
-                        stp = options.stepsizefun(total_iter, options);
+                        %stp = options.stepsizefun(total_iter, options);
+                        stp = sto / (1 + sto * regul * total_iter);
                         stepn = (stp/mv)*step;
                         
                     elseif mval==3  % m = 2n and constant c = eta_0, m=7
@@ -119,7 +123,8 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
 
                     elseif mval==5  % m = 1 and constant c = eta_0 (decay), m=9
                         mv = 1/2; 
-                        stp = options.stepsizefun(total_iter, options);
+                        stp = sto / (1 + sto * regul * total_iter);
+                        %options.stepsizefun(total_iter, options);
                         stepn = (stp/mv)*step;
                         
                     elseif mval==6  % m = 1 and constant c = eta_0, m=10
@@ -170,12 +175,13 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
 %             
             total_iter = total_iter + 1;
         end
+        % measure elapsed time
+        elapsed_time = toc(start_time);
         
         vr = norm(step*v-step*problem.grad(w,1:n))^2;
         
         
-        % measure elapsed time
-        elapsed_time = toc(start_time);
+
         
         % count gradient evaluations
         grad_calc_count = grad_calc_count + 2*j * options.batch_size;        

@@ -4,16 +4,15 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = [2 ]%4 5]%2%dataset    
+for d = [2 4 5]%1:6%2%dataset    
     d    
     dat = char(datast(d));
     
-    for m=1:2%10%methods
+    for m=1:10%10%methods
     
-        for reg = 0.001%[0.0001 0.001 0.01] 
+        for reg = [0.0001 0.001 0.01] 
    
-    
-                for step = 0.01%[0.1 0.01 0.001 0.0001 0.00001 1 10 100 1000]
+                for step =  [0.1 0.01 0.001 0.0001 0.00001 1 10 100 1000]
 
                   Tr_s1 = []; %Tr_s2 = []; Tr_s3 = [];
                   C_s1 = []; %C_s2 = []; C_s3 = [];
@@ -24,7 +23,7 @@ for d = [2 ]%4 5]%2%dataset
                   var = [];
                   lr_rate = [];
     
-                        for s=1:1%2
+                        for s=1:2
                             
                             fprintf('\n ======      Loop number: S=%d, Step=%f, reg=%f,  m = %d, data = %d ======== \n',s,step,reg,m,d);
                             if d==1
@@ -36,7 +35,7 @@ for d = [2 ]%4 5]%2%dataset
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 options.max_epoch=30; %30;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(1);%80
+                                [w_opt,infos_LBFGS] = problem.calc_solution(80);%80
                                 size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
@@ -69,6 +68,7 @@ for d = [2 ]%4 5]%2%dataset
                             options.step_alg = 'fix';
                             options.step_init = step; 
                             options.verbose = 2;
+                            options.regu = reg;
                             options.batch_size = 1;
                             options.tol_optgap = 10^-27;
     
@@ -84,40 +84,48 @@ for d = [2 ]%4 5]%2%dataset
                                 
                             
                             elseif m==3
+                                tic
                                 [w_s1, info_s1] = svrg_bb(problem, options);
-                            
+                                toc
                             elseif m==4
+                                tic
                                 [w_s1, info_s1] = svrgbb(problem, options);
-                            
+                                toc
                             elseif m==5
+                                tic
                                 [w_s1, info_s1] = svrgbbb(problem, options,1);  % (eta/1) * bb --> SVRG-2BBS --> BB step size with SVRG-2BB eta=fix
-                            
+                                toc
                             elseif m==6
+                                tic
                                  options.step_alg = 'decay';
                                 [w_s1, info_s1] = svrgbbb(problem, options,2);  % (eta/1) * bb --> BB step size with (eta/m=1)*BB --> eta decay
-                            
+                                toc
                             elseif m==7
+                                tic
                                 options.step_alg = 'fix';
                                 [w_s1, info_s1] = svrgbbb(problem, options,3);  % (eta/m) * bb 
                             %    [w_s1, info_s1] = svrg2nd(problem, options);elseif m==5
-                            
+                                toc
                             elseif m==8
+                                tic
                                 options.step_alg = 'fix';
                                 [w_s1, info_s1] = svrgbbb(problem, options,4);  % (eta/1) * bb --> SVRG-2BBS --> BB step size with SVRG-2BB eta=fix
-                                
+                                toc
                             elseif m==9
+                                tic
                                 options.step_alg = 'decay';
                                 [w_s1, info_s1] = svrgbbb(problem, options,5);  % (eta/1) * bb --> BB step size with (eta/m=1)*BB --> eta decay
-                            
+                                toc
                             elseif m==10
+                                tic
                                 options.step_alg = 'fix';
                                 [w_s1, info_s1] = svrgbbb(problem, options,6);  % (eta/m) * bb 
-                            
+                                toc
                             end
                             pathh = 'SVRG_BB/Results_2022';
                             LBFGS = infos_LBFGS;
                             Name = sprintf('%s/%s/LBFGS_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-                           % save(Name,'LBFGS');% 
+                            %save(Name,'LBFGS');% 
                             if isinf(w_s1)
                                 %(info_s1.iter(end) < options.max_epoch) && (info_s1.optgap(end) < options.tol_optgap)
                                 break;

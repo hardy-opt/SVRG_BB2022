@@ -61,6 +61,9 @@ function [w, infos] = svrg(problem, in_options)
         fprintf('SVRG: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
     end      
     
+    step = options.step_init;
+    %fprintf('step=%f',step);    
+    
     % set start time
     start_time = tic();
 
@@ -85,14 +88,12 @@ function [w, infos] = svrg(problem, in_options)
             [subinfos, f_val, optgap] = store_subinfos(problem, w, full_grad, options, subinfos, epoch, total_iter, grad_calc_count, 0);           
         end         
 		
-          
-
         
         for j = 1 : num_of_bachces
             
             
             % update step-size
-            step = options.stepsizefun(total_iter, options);                 
+            %step = options.stepsizefun(total_iter, options);                 
            
             % calculate variance reduced gradient
             start_index = (j-1) * options.batch_size + 1;
@@ -129,11 +130,12 @@ function [w, infos] = svrg(problem, in_options)
             end            
         end
         
-
-        vr = norm(step*v-step*problem.grad(w,1:n))^2;
-
         % measure elapsed time
         elapsed_time = toc(start_time);
+        
+        vr = norm(step*v-step*problem.grad(w,1:n))^2;
+
+
         
         % count gradient evaluations
         grad_calc_count = grad_calc_count + j * options.batch_size;        

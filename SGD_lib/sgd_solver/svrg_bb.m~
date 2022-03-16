@@ -62,10 +62,7 @@ function [w, infos] = svrg_bb(problem, in_options)
     if options.verbose > 0
         fprintf('SVRG BB(SS): Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
     end      
-    
-    step = options.step_init;
-    %fprintf('step=%f',step);
-    
+
     % set start time
     start_time = tic();
     
@@ -104,8 +101,7 @@ function [w, infos] = svrg_bb(problem, in_options)
 
         for j = 1 : num_of_bachces
           
-           % step = options.stepsizefun(total_iter, options);                 
-
+            
             % calculate variance reduced gradient
             start_index = (j-1) * options.batch_size + 1;
             indice_j = perm_idx(start_index:start_index+options.batch_size-1);
@@ -114,7 +110,7 @@ function [w, infos] = svrg_bb(problem, in_options)
             
             % update w
             v = (full_grad + grad - grad_0);
-            w = w - step * v;
+            w = w - step * (full_grad + grad - grad_0);
             
             
             if any(isnan(v)) || any(isinf(v)) || any(isnan(w)) || any(isinf(w)) || optgap>10^5

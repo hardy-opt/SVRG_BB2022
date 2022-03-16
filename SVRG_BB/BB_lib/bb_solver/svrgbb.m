@@ -56,14 +56,15 @@ function [w, infos] = svrgbb(problem, in_options)
     clear infos;    
     [infos, f_val, optgap] = store_infos(problem, w, options, [], epoch, grad_calc_count, 0);  
     
-    % set start time
-    start_time = tic();
+    step = options.step_init;
     
     % display infos
     if options.verbose > 0
         fprintf('SVRG2BB: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
     end      
-
+    
+    % set start time
+    start_time = tic();
     % main loop
     
     %while (optgap > options.tol_optgap) && (epoch < options.max_epoch)
@@ -81,7 +82,7 @@ function [w, infos] = svrgbb(problem, in_options)
             full_grad_old = full_grad;
 
             % compute full gradient
-            full_grad = problem.grad(w,1:n);
+            full_grad = problem.full_grad(w);
   
             % automatic step size selection based on Barzilai-Borwein (BB)
             w_diff = w - w0;
@@ -93,7 +94,7 @@ function [w, infos] = svrgbb(problem, in_options)
            % fprintf('step:%f\n', step);
         else
             % compute full gradient
-            full_grad = problem.grad(w,1:n);
+            full_grad = problem.full_grad(w);
         end
         
         % store w
@@ -108,7 +109,7 @@ function [w, infos] = svrgbb(problem, in_options)
         for j = 1 : num_of_bachces
             
             % update step-size
-            step = options.stepsizefun(total_iter, options);
+            %step = options.stepsizefun(total_iter, options);
          
             
             %calculate variance reduced gradient
@@ -154,12 +155,13 @@ function [w, infos] = svrgbb(problem, in_options)
 %             
             total_iter = total_iter + 1;
         end
+
+        % measure elapsed time
+        elapsed_time = toc(start_time);
         
         vr = norm(step*v-step*problem.grad(w,1:n))^2;
         
         
-        % measure elapsed time
-        elapsed_time = toc(start_time);
         
         % count gradient evaluations
         grad_calc_count = grad_calc_count + 2*j * options.batch_size;        
