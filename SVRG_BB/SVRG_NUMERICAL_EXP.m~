@@ -4,7 +4,7 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = [2 4 5]%1:6%2%dataset    
+for d = 1:6 % 1:6%2%dataset    
     d    
     dat = char(datast(d));
     
@@ -35,7 +35,7 @@ for d = [2 4 5]%1:6%2%dataset
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 options.max_epoch=30; %30;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(1);%80
+                                [w_opt,infos_LBFGS] = problem.calc_solution(80);%80
                                 size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
@@ -49,9 +49,10 @@ for d = [2 4 5]%1:6%2%dataset
                                 [w_opt,infos_LBFGS] = problem.calc_solution(200);
                             elseif d==5
                                 data = W8A(s);
-                                problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=25;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(150);
+                                %problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
+                                problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
+                                options.max_epoch=50;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(100);
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
@@ -157,41 +158,41 @@ for d = [2 4 5]%1:6%2%dataset
                             info.grad_count = (info_s1.grad_calc_count)';
 
                             S1=info;
-%                             
-%                             if m==1
-%                             Name = sprintf('%s/%s/svrg_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');%
-%                             elseif m==2
-%                             Name = sprintf('%s/%s/svrg_2d_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');%
-%                             elseif m==3
-%                             Name = sprintf('%s/%s/svrg_bb_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');% SVRG_BB with BB step size
-%                             elseif m==4
-%                             Name = sprintf('%s/%s/svrg_2bb_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');% SVRG_BB with second order info
-%                             elseif m==5
-%                             %Name = sprintf('/home/optima/Desktop/SVRG_library/Results_30_Dec2021/%s/svrg_bbb_%.1e_R_%.1e.mat',dat,options.step_init,reg);
-%                             Name = sprintf('%s/%s/svrg_2bbs_eta_one_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info.
-%                             elseif m==6
-%                             Name = sprintf('%s/%s/svrg_2bbs_eta_decay_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 1
-%                             elseif m==7
-%                             Name = sprintf('%s/%s/svrg_2bbs_eta_constant_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1'); % SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 2n
-%                             elseif m==8
-%                             %Name = sprintf('/home/optima/Desktop/SVRG_library/Results_30_Dec2021/%s/svrg_bbb_%.1e_R_%.1e.mat',dat,options.step_init,reg);
-%                             Name = sprintf('%s/%s/svrg_2bbs_eta_one_m1_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info.
-%                             elseif m==9
-%                             Name = sprintf('%s/%s/svrg_2bbs_eta_decay_m1_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 1
-%                             elseif m==10
-%                             Name = sprintf('%s/%s/svrg_2bbs_eta_constant_m1_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-%                             save(Name,'S1'); % SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 2n
-%                             end
-%                             lr_rate
+                            
+                            if m==1
+                            Name = sprintf('%s/%s/svrg_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');%
+                            elseif m==2
+                            Name = sprintf('%s/%s/svrg_2d_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');%
+                            elseif m==3
+                            Name = sprintf('%s/%s/svrg_bb_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');% SVRG_BB with BB step size
+                            elseif m==4
+                            Name = sprintf('%s/%s/svrg_2bb_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');% SVRG_BB with second order info
+                            elseif m==5
+                            %Name = sprintf('/home/optima/Desktop/SVRG_library/Results_30_Dec2021/%s/svrg_bbb_%.1e_R_%.1e.mat',dat,options.step_init,reg);
+                            Name = sprintf('%s/%s/svrg_2bbs_eta_one_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info.
+                            elseif m==6
+                            Name = sprintf('%s/%s/svrg_2bbs_eta_decay_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 1
+                            elseif m==7
+                            Name = sprintf('%s/%s/svrg_2bbs_eta_constant_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1'); % SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 2n
+                            elseif m==8
+                            %Name = sprintf('/home/optima/Desktop/SVRG_library/Results_30_Dec2021/%s/svrg_bbb_%.1e_R_%.1e.mat',dat,options.step_init,reg);
+                            Name = sprintf('%s/%s/svrg_2bbs_eta_one_m1_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info.
+                            elseif m==9
+                            Name = sprintf('%s/%s/svrg_2bbs_eta_decay_m1_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1');% SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 1
+                            elseif m==10
+                            Name = sprintf('%s/%s/svrg_2bbs_eta_constant_m1_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
+                            save(Name,'S1'); % SVRG_BB with BB step size and BB in 2nd order info. with eta and m = 2n
+                            end
+                            lr_rate
                             clear info_s1;
                             clear lr_rate
                             clear S1;

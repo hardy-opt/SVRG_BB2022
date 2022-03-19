@@ -4,13 +4,13 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = [2 4 5]%1:6%2%dataset    
+for d = 5%1:6 % 1:6%2%dataset    
     d    
     dat = char(datast(d));
     
     for m=1:10%10%methods
     
-        for reg = [0.0001 0.001 0.01] 
+        for reg = [0.0001 0.001 0.01] % 1e-5
    
                 for step =  [0.1 0.01 0.001 0.0001 0.00001 1 10 100 1000]
 
@@ -49,9 +49,10 @@ for d = [2 4 5]%1:6%2%dataset
                                 [w_opt,infos_LBFGS] = problem.calc_solution(200);
                             elseif d==5
                                 data = W8A(s);
-                                problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=25;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(150);
+                                %problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
+                                problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
+                                options.max_epoch=50;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(100);
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
@@ -125,7 +126,7 @@ for d = [2 4 5]%1:6%2%dataset
                             pathh = 'SVRG_BB/Results_2022';
                             LBFGS = infos_LBFGS;
                             Name = sprintf('%s/%s/LBFGS_%.1e_R_%.1e.mat',pathh,dat,options.step_init,reg);
-                            %save(Name,'LBFGS');% 
+                            save(Name,'LBFGS');% 
                             if isinf(w_s1)
                                 %(info_s1.iter(end) < options.max_epoch) && (info_s1.optgap(end) < options.tol_optgap)
                                 break;
