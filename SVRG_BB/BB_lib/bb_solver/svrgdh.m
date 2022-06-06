@@ -99,6 +99,7 @@
             bb = A.*vec -Atk.*vec;
             
             % update w
+            w_var = w; % previous w to calculate variance
             v = full_grad + grad - grad_0 + bb;
             w = w - step * v;
             
@@ -125,7 +126,7 @@
         % measure elapsed time
         elapsed_time = toc(start_time);
         
-        vr = norm(step*v-step*problem.grad(w,1:n))^2;
+        vr = norm(v-problem.grad(w_var,1:n))^2;
         
         
         % count gradient evaluations

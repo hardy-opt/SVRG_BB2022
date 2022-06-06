@@ -138,6 +138,7 @@ function [w, infos] = svrgbb(problem, in_options)
                 
                 
             % update w
+            w_var = w; % current w to calculate variance!
             v =  (full_grad + grad - grad_0 + bb);
             w = w - step * v;
             
@@ -159,7 +160,7 @@ function [w, infos] = svrgbb(problem, in_options)
         % measure elapsed time
         elapsed_time = toc(start_time);
         
-        vr = norm(step*v-step*problem.grad(w,1:n))^2;
+        vr = norm(v-problem.grad(w_var,1:n))^2;
         
         
         

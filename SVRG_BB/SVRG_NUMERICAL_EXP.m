@@ -4,7 +4,7 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = 5%1:6 % 1:6%2%dataset    
+for d = 1:6 % 1:6%2%dataset    
     d    
     dat = char(datast(d));
     
@@ -29,23 +29,23 @@ for d = 5%1:6 % 1:6%2%dataset
                             if d==1
                                 data = ADULT(s); 
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=30; %30    
+                                options.max_epoch=40; %30    
                                 [w_opt,infos_LBFGS] = problem.calc_solution(100);
                             elseif d==2
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=30; %30;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(80);%80
+                                options.max_epoch=40; %30;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(85);%80
                                 size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=20;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(40);
+                                options.max_epoch=25; %20    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(45);
                             elseif d==4
                                 data = MNIST38(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=25;    
+                                options.max_epoch=50; %25    
                                 [w_opt,infos_LBFGS] = problem.calc_solution(200);
                             elseif d==5
                                 data = W8A(s);
@@ -56,8 +56,8 @@ for d = 5%1:6 % 1:6%2%dataset
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=20;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(40);
+                                options.max_epoch=25;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(45);
                                 
                             end
 
