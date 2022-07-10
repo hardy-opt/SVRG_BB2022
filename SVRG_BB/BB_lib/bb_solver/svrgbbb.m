@@ -15,7 +15,7 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
     %%%%%%%%%%%%%%%
     acc_tr = [0];
     acc_val = [0];
-    var = [0];
+    
     vr=[0];
     val_cost=[0];
     lr_rate = [0];
@@ -28,6 +28,8 @@ function [w, infos] = svrgbbb(problem, in_options,mval)
     epoch = 0;
     grad_calc_count = 0;
     w = options.w_init;
+    vg = norm(problem.full_grad(w))^2;
+    var = [vg];
     num_of_bachces = floor(n / options.batch_size)*2;  
     
      

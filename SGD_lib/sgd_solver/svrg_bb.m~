@@ -34,7 +34,7 @@ function [w, infos] = svrg_bb(problem, in_options)
     %%%%%%%%%%%%%%%
     acc_tr = [0];
     acc_val = [0];
-    var = [0];
+    
     vr=[0];
     val_cost=[0];
     step=1;
@@ -46,6 +46,8 @@ function [w, infos] = svrg_bb(problem, in_options)
     epoch = 0;
     grad_calc_count = 0;
     w = options.w_init;
+    vg = problem.full_grad(w);
+    var = [vg];
     num_of_bachces = floor(n / options.batch_size)*2;  
     
     if ~isfield(options, 'max_inner_iter')
@@ -62,7 +64,10 @@ function [w, infos] = svrg_bb(problem, in_options)
     if options.verbose > 0
         fprintf('SVRG BB(SS): Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
     end      
-
+    
+    step = options.step_init;
+    %fprintf('step=%f',step);
+    
     % set start time
     start_time = tic();
     
@@ -101,7 +106,8 @@ function [w, infos] = svrg_bb(problem, in_options)
 
         for j = 1 : num_of_bachces
           
-            
+           % step = options.stepsizefun(total_iter, options);                 
+
             % calculate variance reduced gradient
             start_index = (j-1) * options.batch_size + 1;
             indice_j = perm_idx(start_index:start_index+options.batch_size-1);
@@ -109,8 +115,9 @@ function [w, infos] = svrg_bb(problem, in_options)
             grad_0 = problem.grad(w0, indice_j);
             
             % update w
+            w_var = w;% previous w to calculate variance
             v = (full_grad + grad - grad_0);
-            w = w - step * (full_grad + grad - grad_0);
+            w = w - step * v;
             
             
             if any(isnan(v)) || any(isinf(v)) || any(isnan(w)) || any(isinf(w)) || optgap>10^5
@@ -130,7 +137,7 @@ function [w, infos] = svrg_bb(problem, in_options)
         % measure elapsed time
         elapsed_time = toc(start_time);
         
-        vr = norm(step*v-step*problem.grad(w,1:n))^2;
+        vr = norm(v-problem.grad(w_var,1:n))^2;
 
         
         
