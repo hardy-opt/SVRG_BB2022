@@ -4,12 +4,12 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = 1:6 % 1:6%2%dataset        
+for d = 6:6 % 1:6%2%dataset        
     dat = char(datast(d));
     
     for m=1:10%10%methods
     
-        for reg = [1e-2 1e-3 1e-4 1e-5] 
+        for reg = [1e-3 1e-4 1e-5 1e-2] 
    
                 for step =  [0.1 0.01 0.001 0.0001 0.00001 1 10 100 1000]
 
@@ -22,7 +22,7 @@ for d = 1:6 % 1:6%2%dataset
                   var = [];
                   lr_rate = [];
     
-                        for s=1:3
+                        for s=1:2
                             
                             fprintf('\n ======      Loop number: S=%d, Step=%f, reg=%f,  m = %d, data = %d ======== \n',s,step,reg,m,d);
                             if d==1
@@ -55,8 +55,8 @@ for d = 1:6 % 1:6%2%dataset
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=35;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(55);
+                                options.max_epoch=20;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(45);
                                 
                             end
 

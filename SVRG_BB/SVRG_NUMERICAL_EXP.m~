@@ -28,13 +28,13 @@ for d = 1:6 % 1:6%2%dataset
                             if d==1
                                 data = ADULT(s); 
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=75; %30    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(120);
+                                options.max_epoch=60; %30    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(100);
                             elseif d==2
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=75; %30;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(120);%80
+                                options.max_epoch=60; %30;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(110);%80
                                 size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
@@ -50,13 +50,13 @@ for d = 1:6 % 1:6%2%dataset
                                 data = W8A(s);
                                 %problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=70;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(110);
+                                options.max_epoch=60;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(100);
                             elseif d==6
                                 data = COVTYPE(s);
                                 problem = logistic_regression1(data.x_train, data.y_train, data.x_test, data.y_test,reg); 
-                                options.max_epoch=35;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(55);
+                                options.max_epoch=20;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(45);
                                 
                             end
 
