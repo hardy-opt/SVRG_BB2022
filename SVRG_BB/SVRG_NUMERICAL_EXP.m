@@ -4,12 +4,12 @@ function  SVRG_NUMERICAL_EXP()
     clear;
     close all;
     datast = {'Adult','Ijcnn','Gisette','Mnist','W8a','Covtype'};
-for d = 6:6 % 1:6%2%dataset        
+for d = 2:2 % 1:6%2%dataset        
     dat = char(datast(d));
     
-    for m=1:10%10%methods
+    for m=9:9%10%methods
     
-        for reg = [1e-3 1e-4 1e-5 1e-2] 
+        for reg = [1e-3] 
    
                 for step =  [0.1 0.01 0.001 0.0001 0.00001 1 10 100 1000]
 
@@ -33,8 +33,8 @@ for d = 6:6 % 1:6%2%dataset
                             elseif d==2
                                 data = IJCNN1(s);
                                 problem = linear_svm1(data.x_train, data.y_train, data.x_test, data.y_test,reg);
-                                options.max_epoch=60; %30;    
-                                [w_opt,infos_LBFGS] = problem.calc_solution(110);%80
+                                options.max_epoch=20; %30;    
+                                [w_opt,infos_LBFGS] = problem.calc_solution(80);%80
                                 size(infos_LBFGS.cost)
                             elseif d==3
                                 data = GISETTE(s);
@@ -113,6 +113,7 @@ for d = 6:6 % 1:6%2%dataset
                                 toc
                             elseif m==9
                                 tic
+                                options.step_init
                                 options.step_alg = 'decay';
                                 [w_s1, info_s1] = svrgbbb(problem, options,5);  % (eta/1) * bb --> BB step size with (eta/m=1)*BB --> eta decay
                                 toc
